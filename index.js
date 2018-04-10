@@ -32,7 +32,7 @@ app.post('/shout', (req, res) => {
 		return;
     }
     
-    lastMessage = text;
+    lastMessage = req.body.text;
 
     res.send({
         response_type: 'ephemeral',
