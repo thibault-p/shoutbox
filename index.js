@@ -1,14 +1,20 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+const fs = require('fs');
+const path = require('path');
 
 const slash_token = process.env.SLACK_SLASH_TOKEN || 'test';
+
+const dstDir = process.env.OPENSHIFT_DATA_DIR || '.';
+
+const shoutFile = path.join(dstDir, 'shout.data');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
-let lastMessage = '';
+let lastMessage = undefined;
 
 
 app.post('/shout', (req, res) => {
@@ -32,21 +38,36 @@ app.post('/shout', (req, res) => {
 		return;
     }
     
-    lastMessage = req.body.text;
-
-    res.send({
-        response_type: 'ephemeral',
-        text: `Votre message a été entendu. ;)`
-    });
+	lastMessage = req.body.text;
+	fs.writeFile(shoutFile, lastMessage, (err) => {
+		if (err) {
+			console.error('Failed to store shouted message:', err);
+		}
+		res.send({
+			response_type: 'ephemeral',
+			text: `Votre message a été entendu. ;)`
+		});
+	});
 });
 
 app.get('/shout', (req, res) => {
-    res.send(lastMessage);
+	if (lastMessage !== undefined) {
+		res.send(lastMessage);
+		return;
+	}
+	// try to read it from file
+	fs.readFile(shoutFile, (err, data) => {
+		if (err) {
+			console.error('Failed to read file: ', err);
+		}
+		lastMessage = data;
+		res.send(lastMessage || '');
+	});
 });
 
 
-var port = process.env.OPENSHIFT_NODEJS_PORT || 8080
-var address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
+const port = process.env.OPENSHIFT_NODEJS_PORT || 8080
+const address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
  
 app.listen(port, address, function () {
   console.log( "Listening on " + address + ", port " + port )
