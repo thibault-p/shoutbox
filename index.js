@@ -106,7 +106,7 @@ app.post('/release', (req, res) => {
 
 		res.send({
 			response_type: 'ephemeral',
-			text: `text`
+			text: text
 		});
 	});
 });
