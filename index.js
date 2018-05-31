@@ -22,7 +22,7 @@ let releaseIP = undefined;
 
 app.post('/shout', (req, res) => {
     if (!req || !req.body) {
-		res.status(403);
+		res.status(401);
 		return;
 	}
 
@@ -36,7 +36,7 @@ app.post('/shout', (req, res) => {
     
     // get command
 	if (!req.body.text) {
-		res.status(403);
+		res.status(400);
 		res.send({ error: 'text is missing' });
 		return;
     }
@@ -71,7 +71,7 @@ app.get('/shout', (req, res) => {
 
 app.post('/release', (req, res) => {
     if (!req || !req.body) {
-		res.status(403);
+		res.status(401);
 		return;
 	}
 
@@ -83,9 +83,9 @@ app.post('/release', (req, res) => {
 		return;
     }
     
-    // get command
-	if (!req.body.text || req.body.text !== 'begin' || req.body.text !== 'end') {
-		res.status(403);
+	// get command
+	if (!req.body.text || (req.body.text !== 'begin' && req.body.text !== 'end')) {
+		res.status(400);
 		res.send({ error: 'Option is not valid.' });
 		return;
 	}
