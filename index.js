@@ -4,7 +4,8 @@ const app = express();
 const fs = require('fs');
 const path = require('path');
 
-const slash_token = process.env.SLACK_SLASH_TOKEN || 'test';
+const slash_token_shout = process.env.SLACK_SLASH_TOKEN_SHOUT || 'test';
+const slash_token_release = process.env.SLACK_SLASH_TOKEN_RELEASE || 'test';
 
 const dstDir = process.env.OPENSHIFT_DATA_DIR || '.';
 
@@ -26,7 +27,7 @@ app.post('/shout', (req, res) => {
 	}
 
 	// check token
-	if (req.body.token !== slash_token)
+	if (req.body.token !== slash_token_shout)
 	{
 		res.status(403);
 		res.send({ error: 'token not valid' });
@@ -75,7 +76,7 @@ app.post('/release', (req, res) => {
 	}
 
 	// check token
-	if (req.body.token !== slash_token)
+	if (req.body.token !== slash_token_release)
 	{
 		res.status(403);
 		res.send({ error: 'token not valid' });
